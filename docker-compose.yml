@@ -1,0 +1,54 @@
+version: '3.9'
+services:
+  data_base_c:
+    restart: always
+    image: "postgres:15.0"
+    container_name: data_base_c
+    volumes:
+      - ./data_base_c/:/var/lib/postgresql/data
+    environment:
+      PGDATA: "/var/lib/postgresql/pgdata"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5433:5432
+
+  api:
+    restart: always
+    build: ./api
+    env_file:
+      - .env
+    command: bash -c " uvicorn main:app --reload --workers 4 --host 0.0.0.0 --port 8000"
+    ports:
+      - 8000:8000
+    depends_on: 
+      - data_base_c
+    volumes:
+      - ./api:/api
+
+  # front:
+  #   restart: always
+  #   build: ./frontend
+  #   env_file:
+  #     - .env
+  #   # environment:
+  #   #   API_URL: http://localhost:8000/api/v1
+  #   volumes:
+  #     - ./frontend:/app
+  #   ports:
+  #     - "3000:3000"
+  #   command: [ "yarn" , "dev","--host","0.0.0.0"]
+
+  # nginx:
+  #   image: nginx:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./nginx:/etc/nginx/conf.d
+  #   depends_on:
+  #     - front
+  #     - api
+
+  #   ports:
+  #     - "8080:8080"
+
