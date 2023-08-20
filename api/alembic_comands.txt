@@ -8,3 +8,5 @@ alembic stamp head
 docker-compose run api alembic revision --autogenerate -m "First migration"
 docker-compose run api alembic upgrade head
 docker-compose run api alembic stamp head
+
+openssl rand -hex 32

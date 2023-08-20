@@ -18,27 +18,27 @@ from config.database import (
     engine
 )
 from config.sessions import get_session
-from app.service.models.service import Service
-from app.service.models.company_wash_service import CompWashService
-from app.car.model import Auto
-from app.location.models.city import City
-from app.location.models.metroline import MetroLine
-from app.location.models.metrostation import MetroStation
-from app.auth.services.hash_pass import get_hashed_password
-from app.users.models.client import Client
-from app.users.models.manager import (
-    Manager,
-    Role
-)
-from app.company.model import WashingCompany
-from app.payment.model import (
-    Payment,
-    StatusPayment
-)
-from app.order.model import (
-    Order,
-    StatusOrder
-)
+# from app.service.models.service import Service
+# from app.service.models.company_wash_service import CompWashService
+# from app.car.model import Auto
+# from app.location.models.city import City
+# from app.location.models.metroline import MetroLine
+# from app.location.models.metrostation import MetroStation
+# from app.auth.services.hash_pass import get_hashed_password
+# from app.users.models.client import Client
+# from app.users.models.manager import (
+#     Manager,
+#     Role
+# )
+# from app.company.model import WashingCompany
+# from app.payment.model import (
+#     Payment,
+#     StatusPayment
+# )
+# from app.order.model import (
+#     Order,
+#     StatusOrder
+# )
 
 
 app = APIRouter(
