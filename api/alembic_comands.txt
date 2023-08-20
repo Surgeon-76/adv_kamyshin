@@ -1,0 +1,10 @@
+alembic init alembic
+alembic revision --autogenerate -m "made some changes"
+alembic upgrade head
+
+alembic stamp head
+
+из под docker:
+docker-compose run api alembic revision --autogenerate -m "First migration"
+docker-compose run api alembic upgrade head
+docker-compose run api alembic stamp head

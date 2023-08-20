@@ -1,255 +1,303 @@
 import random
+import uuid
+
+from sqlalchemy import (
+    select,
+    func
+)
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import (
     APIRouter,
-    status
+    status,
+    Depends
 )
+from faker import Faker
 
-from users.models.users import User
-from buysell_advertisement.categories.models.categories import Category
-from buysell_advertisement.ads.models.ads import ADVT
-from buysell_advertisement.ads.models.image_ads import PhotoADVT
-from apartments.models.categorie import (
-    Categorie,
-    TransactionVar,
-    TypeOfHousing
-)
-
-from settings.db import (
-    metadata,
+from config.database import (
+    Base,
     engine
 )
-
-from services.slug import generate_slug
+from config.sessions import get_session
+from app.service.models.service import Service
+from app.service.models.company_wash_service import CompWashService
+from app.car.model import Auto
+from app.location.models.city import City
+from app.location.models.metroline import MetroLine
+from app.location.models.metrostation import MetroStation
+from app.auth.services.hash_pass import get_hashed_password
+from app.users.models.client import Client
+from app.users.models.manager import (
+    Manager,
+    Role
+)
+from app.company.model import WashingCompany
+from app.payment.model import (
+    Payment,
+    StatusPayment
+)
+from app.order.model import (
+    Order,
+    StatusOrder
+)
 
 
 app = APIRouter(
-    prefix='/api/v1/generate',
-    tags=['Генератор контента:']
+    prefix="/api/v1/generate",
+    tags=["Генератор контента:"]
 )
 
 
+fake = Faker(locale="ru_RU")
+
+
 async def database_clear():
-    metadata.drop_all(bind=engine)
-    metadata.create_all(bind=engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
 
-text = 'Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов, используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без заметных изменений пять веков, но и перешагнул в электронный дизайн. Его популяризации в новое время послужили публикация листов Letraset с образцами Lorem Ipsum в 60-х годах и, в более недавнее время, программы электронной вёрстки типа Aldus PageMaker, в шаблонах которых используется Lorem Ipsum.'
-users = []
+async def create_auto(db: AsyncSession):
+
+    for i in range(1, 31):
+        new_car = {
+            "car_brand": f"атобренд {i}",
+            "car_model": f"модель авто {random.randint(1, 20)}"
+            }
+        car = Auto(**new_car)
+        async with db.begin():
+            db.add(car)
+            await db.commit()
+
+        print(f"Автомобиль: {car.car_brand} {car.car_model} создан")
 
 
-async def create_user():
+async def create_city(db: AsyncSession):
 
-    # user
-    phone = 1111111111
-    for user in range(10, 300):
-        phone += 1
-        new_user = {
-            "email": f"string{user}",
-            "phone": f'+7{phone}',
-            "password": "string"
-        }
-        usern = await User(**new_user).save()
-        users.append(usern)
-        print(f'user {user}')
+    Faker.seed(0)
+    for _ in range(1, 101):
+        new_city = {
+            "name": f"{fake.unique.city_name()}"
+            }
+        city = City(**new_city)
+        async with db.begin():
+            db.add(city)
+            await db.commit()
 
-categories = []
+        print(f"Город {city.name} создан")
 
 
-async def create_category():
-    parent_category_list = []
-    for item in range(1, 30):
+async def create_metroline(db: AsyncSession):
 
-        parent_category = None
+    Faker.seed(0)
 
-        data = {
-            "name": f'Категория{item}',
-            "parent_category": parent_category,
-            "slug": generate_slug(f'Категория{item}'),
-            "logo": '/static/images/images.jpeg',
-            'popular': True
-        }
+    city_id_list = [random.randint(1, 100) for _ in range(1, 71)]
+    city_id_list = list(set(city_id_list))
 
-        cat = await Category(**data).save()
-        parent_category_list.append(cat)
-
-    child_category_list = []
-    for item in range(1, 400):
-        parent_category = random.choice(parent_category_list)
-
-        data = {
-            "name": f'Категория-2 {item}',
-            "parent_category": parent_category,
-            "slug": generate_slug(f'Категория-2 {item}'),
-            "logo": ''
-        }
-
-        cat = await Category(**data).save()
-        child_category_list.append(cat)
-
-    for item in range(1, 2000):
-        parent_category = random.choice(child_category_list)
-
-        data = {
-            "name": f'Категория-3 {item}',
-            "parent_category": parent_category,
-            "slug": generate_slug(f'Категория-3 {item}'),
-            "logo": ''
-        }
-
-        cat = await Category(**data).save()
-
-        categories.append(cat)
-
-list_ads = []
-
-
-async def create_ads():
-    phone = 1111111111
-    itemc = 1
-    for item in range(1, 2000):
-        phone += 1
-        itemc += item
-        data = {
-            "logo": '/static/images/images.jpeg',
-            "agreement": True,
-            "user": random.choice(users),
-            "phone": f'+7{phone}',
-            "title": f'Обьявление {item}',
-            "descriptions": text,
-            "category": random.choice(categories),
-
-            "service": [
-                {
-                    "name": f'Услуга {itemc+1}',
-                    "price": 112,
-                    "unit_of_dim": random.choice([
-                        'за услугу',
-                        'за м*2',
-                        'за м. погонный',
-                        'за м*3',
-                        'за 1 шт.',
-                        'за 1 метр',
-                        'за 1 км.',
-                        'за 45 мин.',
-                        'за 1 час',
-                        'за 1 сутки',
-                        'за 1 неделю',
-                        'за 1 месяц',
-                    ]),
-                    "slug": generate_slug(f'Услуга {itemc+1}')
-                },
-                {
-                    "name": f'Услуга {itemc+2}',
-                    "price": 112,
-                    "unit_of_dim": random.choice([
-                        'за услугу',
-                        'за м*2',
-                        'за м. погонный',
-                        'за м*3',
-                        'за 1 шт.',
-                        'за 1 метр',
-                        'за 1 км.',
-                        'за 45 мин.',
-                        'за 1 час',
-                        'за 1 сутки',
-                        'за 1 неделю',
-                        'за 1 месяц',
-                    ]),
-                    "slug": generate_slug(f'Услуга {itemc+2}')
-                },
-                {
-                    "name": f'Услуга {itemc+3}',
-                    "price": 112,
-                    "unit_of_dim": random.choice([
-                        'за услугу',
-                        'за м*2',
-                        'за м. погонный',
-                        'за м*3',
-                        'за 1 шт.',
-                        'за 1 метр',
-                        'за 1 км.',
-                        'за 45 мин.',
-                        'за 1 час',
-                        'за 1 сутки',
-                        'за 1 неделю',
-                        'за 1 месяц',
-                    ]),
-                    "slug": generate_slug(f'Услуга {itemc+3}')
-                },
-                {
-                    "name": f'Услуга {itemc+4}',
-                    "price": 112,
-                    "unit_of_dim": random.choice([
-                        'за услугу',
-                        'за м*2',
-                        'за м. погонный',
-                        'за м*3',
-                        'за 1 шт.',
-                        'за 1 метр',
-                        'за 1 км.',
-                        'за 45 мин.',
-                        'за 1 час',
-                        'за 1 сутки',
-                        'за 1 неделю',
-                        'за 1 месяц',
-                    ]),
-                    "slug": generate_slug(f'Услуга {itemc+4}')
+    for i in range(1, len(city_id_list)):
+        for _ in range(random.randint(1, 15)):
+            new_metroline = {
+                "name": f"Линия-'{fake.color_name()}'",
+                "city_id": city_id_list[i]
                 }
-            ]
-        }
+            metroline = MetroLine(**new_metroline)
+            async with db.begin():
+                db.add(metroline)
+                await db.commit()
+            print(f"{metroline.name}города с ID {metroline.city_id} создана")
 
-        ad = ADVT(**data)
-        await ad.save_related(follow=True, save_all=True)
-        await ad.update(slug=generate_slug(str(ad.title)+str(ad.id)))
-        list_ads.append(ad)
-        if item % 2 == 0:
-            for _ in range(0, 10):
-                data = {
-                    'photo': '/static/images/images.jpeg',
-                    'photo_thumb': '/static/images/images.jpeg',
-                    'adv': ad
+
+async def create_metrostation(db: AsyncSession):
+
+    count_metro = await db.scalar(select(func.count()).select_from(MetroLine))
+    for i in range(1, count_metro + 1):
+        metroline = await db.get(MetroLine, i)
+        quantity = random.randint(1, 10)
+        for j in range(1, quantity):
+            new_metrostation = {
+                "name": f"Станция {j} {metroline.name}-{i}",
+                "metroline_id": i
                 }
-                await PhotoADVT(**data).save()
-
-        print(itemc, generate_slug(f'Услуга {itemc+4}'))
-
-
-async def create_appart_categorie():
-    for num in range(1, 51):
-        data = {
-            "transaction": random.choice(
-                [tranz.value for tranz in TransactionVar]),
-            "type_housing": random.choice([typ.value for typ in TypeOfHousing]),
-            "daily": random.randint(0, 1)
-        }
-
-        if data['transaction'] == TransactionVar.tv_1.value:
-            data['daily'] = 0
-
-        await Categorie(**data).save()
-        print(f'Катгория {num} ({data["transaction"]}, {data["type_housing"]}) создана!')
+            metrostation = MetroStation(**new_metrostation)
+            db.add(metrostation)
+            await db.commit()
+            print(f"{metrostation.name} создана")
 
 
-@app.post("/", summary=('Генератор'))
-async def generate_all():
-    await create_user()
-    await create_category()
-    await create_ads()
+async def create_client(db: AsyncSession):
 
-    return {'create': 'ok'}
+    Faker.seed(0)
+    password = get_hashed_password('123')
+    for _ in range(1, 101):
+        new_client = {
+            "email": f"{fake.unique.email(safe=True, domain='yandex.ru') }",
+            "telegram_username": f"@{fake.user_name()}",
+            "phone": f"{fake.unique.phone_number()}",
+            "password": password
+            }
+        client = Client(**new_client)
+        db.add(client)
+        await db.commit()
+        print(f"Клиент {client.telegram_username} создан")
+
+
+async def create_manager(db: AsyncSession):
+
+    count_company = await db.scalar(select(
+        func.count()).select_from(WashingCompany))
+    Faker.seed(0)
+    password = get_hashed_password('123')
+    for _ in range(1, 101):
+        new_manager = {
+            "email": f"{fake.unique.email(safe=True, domain='yandex.ru') }",
+            "password": password,
+            "washing_company_id": random.randint(1, count_company),
+            "role": Role.admin
+            }
+        manager = Manager(**new_manager)
+        db.add(manager)
+        await db.commit()
+        print(f"Менеджер {manager.email} создан")
+    super_admin = Manager(email="admin@mail.ru",
+                          password=password,
+                          washing_company_id=1,
+                          role=Role.superadmin)
+    db.add(super_admin)
+    await db.commit()
+    print(f"Супер Менеджер {super_admin.email} создан")
+
+
+async def create_washing_company(db: AsyncSession):
+
+    Faker.seed(0)
+    count_metro = await db.scalar(select(
+        func.count()).select_from(MetroStation))
+
+    for _ in range(1, 51):
+        num = random.randint(1, count_metro)
+        row = await db.execute(
+            select(MetroStation, MetroLine, City).
+            where(MetroStation.id == num,
+                  MetroLine.id == MetroStation.metroline_id,
+                  City.id == MetroLine.city_id)
+            )
+        for i in row.scalars():
+            res = i
+
+        new_washing_company = {
+            "name": f"{fake.unique.company()}",
+            "address": f"{fake.unique.street_address()} ",
+            "latitude": "15'6654''",
+            "longitude": "56'887456''",
+            "metro_station_id": res.id,
+            "city_id": res.metroline.city_id,
+            "logo": "logo.gif",
+            "moderation": False,
+            "phone": f"{fake.unique.phone_number()}"
+            }
+        washing_company = WashingCompany(**new_washing_company)
+        db.add(washing_company)
+        await db.commit()
+        print(f"Компания: {washing_company.name} создана")
+
+
+async def create_payment(db: AsyncSession):
+
+    Faker.seed(0)
+
+    for i in range(1, 51):
+        new_payment = {
+            "id_payment_acquiring": uuid.uuid4(),
+            "summa": round(random.uniform(1000, 3000), 2),
+            "status": StatusPayment.paid
+            }
+        if i % 2 == 0:
+            new_payment.pop('status')
+        payment = Payment(**new_payment)
+        db.add(payment)
+        await db.commit()
+        print(f"Платёж с UUID: {payment.id_payment_acquiring} создан")
+
+
+async def create_order(db: AsyncSession):
+
+    Faker.seed(0)
+
+    count_client = await db.scalar(select(
+        func.count()).select_from(Client))
+    count_company = await db.scalar(select(
+        func.count()).select_from(WashingCompany))
+    count_auto = await db.scalar(select(
+        func.count()).select_from(Auto))
+    count_payment = await db.scalar(select(
+        func.count()).select_from(WashingCompany))
+
+    for i in range(1, 101):
+        new_order = {
+            "client_id": random.randint(1, count_client),
+            "washing_company_id": random.randint(1, count_company),
+            "auto_id": random.randint(1, count_auto),
+            "payment_id": random.randint(1, count_payment),
+            "number_auto": f"{fake.plate_letter().lower()}{fake.unique.plate_number ()}{fake.plate_letter().lower()}{fake.plate_letter().lower()}",
+            "status": StatusOrder.paid,
+            "summa": round(random.uniform(1000, 5000), 2)
+            }
+        if i % 2 == 0:
+            new_order.pop('status')
+        order = Order(**new_order)
+        db.add(order)
+        await db.commit()
+        print(f"Заказ мойки для авто Рег № {order.number_auto} создан")
+
+
+async def create_services(db: AsyncSession):
+
+    row = await db.execute(select(WashingCompany))
+
+    for company in row.scalars().all():
+        print(f"№: {company.id}, {company}")
+        count_services = random.randint(1, 10)
+        for num in range(1, count_services + 1):
+            cws = CompWashService(price=round(random.uniform(300, 700), 2))
+            new_service = {
+                "name": f"Сервис {num} компании {company.name}",
+                "logo": "logo.gif"
+                }
+            cws.service = Service(**new_service)
+            cws.washing_company_id = company.id
+            db.add(cws.service)
+            await db.commit()
+            print(f"{cws.service_name} создан")
+        print('**************************************************************')
+        print(f"{company} обновлёно")
+        print('##############################################################')
 
 
 @app.post("/debug/", summary=("Отладка"))
-async def debug_function():
-    await create_appart_categorie()
-    # create_rel_provider(db)
-    # create_tender_trade(db)
+async def debug_function(db: AsyncSession = Depends(get_session)):
     return {"отладка закончена": "генератор рабочий!)))"}
+
+
+@app.post("/", summary=("Генератор"))
+async def generate_all(db: AsyncSession = Depends(get_session)):
+
+    await create_auto(db)
+    await create_city(db)
+    await create_metroline(db)
+    await create_metrostation(db)
+    await create_client(db)
+    await create_washing_company(db)
+    await create_manager(db)
+    await create_payment(db)
+    await create_order(db)
+    await create_services(db)
+
+    return {"create": "ok"}
 
 
 @app.delete('/clear/', summary=('Очистка базы данных'),
             status_code=status.HTTP_204_NO_CONTENT)
 async def clear_db():
+    # db: AsyncSession = Depends(get_session)
+    #  user: str = Depends(get_current_user)
     await database_clear()
-
     return {"clear": "ok"}
