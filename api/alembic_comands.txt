@@ -10,3 +10,7 @@ docker-compose run api alembic upgrade head
 docker-compose run api alembic stamp head
 
 openssl rand -hex 32
+
+https://alembic.sqlalchemy.org/en/latest/cookbook.html#using-asyncio-with-alembic
+
+alembic init -t async 

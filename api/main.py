@@ -11,6 +11,8 @@ from config.database import (
     engine
 )
 
+# from app.users.models.users import User    # Удалить в последствии
+
 # from buysell_advertisement.categories.routers import categories as categories
 # from buysell_advertisement.ads.routers import ads as ads
 # from buysell_advertisement.ads.routers import services as services
