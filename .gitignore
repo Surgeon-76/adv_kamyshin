@@ -135,8 +135,8 @@ dmypy.json
 .vscode
 alembic/versions/**/*.*
 /versions/**/*.py
-/images/
-/video/
+# /images/
+# /video/
 # *.webp
 # *.jpg
 # *.jpeg
