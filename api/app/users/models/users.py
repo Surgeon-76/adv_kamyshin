@@ -1,5 +1,6 @@
 from __future__ import annotations
 from sqlalchemy import(
+    Boolean,
     Integer,
     String
 )
@@ -17,14 +18,19 @@ class User(Base):
     __tablename__ = 'user'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    google_id: Mapped[int] = mapped_column(Integer, nullable=True)
-    yandex_id: Mapped[int] = mapped_column(Integer, nullable=True)
-    telegram_id: Mapped[int] = mapped_column(Integer, nullable=True)
-    vk_id: Mapped[int] = mapped_column(Integer, nullable=True)
+    google_id: Mapped[str | None] = mapped_column(String, default=None)
+    yandex_id: Mapped[str | None] = mapped_column(String, default=None)
+    telegram_id: Mapped[str | None] = mapped_column(String, default=None)
+    vk_id: Mapped[str | None] = mapped_column(String, default=None)
     username: Mapped[str] = mapped_column(String, index=True)
     first_name: Mapped[str] = mapped_column(String, default='user')
     last_name: Mapped[str | None] = mapped_column(String, default=None)
+    email: Mapped[str | None] = mapped_column(String, default=None)
     avatar: Mapped[str | None] = mapped_column(String, default=None)
+
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_client: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"

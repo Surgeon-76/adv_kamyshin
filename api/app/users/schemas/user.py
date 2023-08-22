@@ -3,40 +3,91 @@ from typing import Annotated
 from pydantic import (
     BaseModel,
     ConfigDict,
-    Field
+    Field,
+    field_validator
 )
+
+# TODO: сделать None в полях
 
 
 class BaseUser(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    google_id: Annotated[[int | None],
-                         Field(description='google_id',
-                               default=None)]
-    yandex_id: Annotated[[int | None],
-                         Field(description='yandex_id',
-                               default=None)]
-    telegram_id: Annotated[[int | None],
-                           Field(description='telegram_id')]
-    vk_id: Annotated[[int | None],
-                     Field(description='vk_id',
-                           default=None)]
+    google_id: str | None = Field(description='google_id',
+                                  default='')
+    yandex_id: str | None = Field(description='yandex_id',
+                                  default='')
+    telegram_id: str | None = Field(description='telegram_id',
+                                    default='')
+    vk_id: str | None = Field(description='vk_id',
+                              default='')
     username: str = Field(description='Никнейм пользователя',
                           default='user')
     first_name: str | None = Field(description='Имя пользователя',
-                                   default=None)
+                                   default='')
     last_name: str | None = Field(description='Фамилия пользователя',
-                                  default=None)
-    avatar: str | None = Field(description='URL аватара')
+                                  default='')
+    email: str | None = Field(description='email пользователя',
+                              default='')
+    avatar: str | None = Field(description='URL аватара',
+                               default='')
+
+    is_admin: bool = Field(description='Админ', default=False)
+    is_client: bool = Field(description='Пользователь', default=True)
+    is_active: bool = Field(description='Активный', default=True)
 
 
 class UserID(BaseModel):
     id: int = Field(description='ID пользователя')
 
 
-class CreateUser(BaseUser):
+class UserView(BaseUser, UserID):
     pass
 
 
-class UpdateUser(BaseUser, UserID):
+class UserCreate(BaseUser):
     pass
+
+
+class UserUpdate(BaseUser, UserID):
+    pass
+
+# ##############################################################
+
+
+class UserResp(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: UserView | None = None
+
+
+class UserError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: dict | None = None
+
+
+class UserPage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str = 'succes'
+    status_code: int = 200
+    payload: list[UserView] | None = None
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
+class UserPageError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: list | None = None
+
+
+class UserDel(BaseModel):     # TODO: Проверить явную необходимость этой модели
+    status: str = 'succes'
+    status_code: int
+    payload: dict | None = None
+
+################################################################
