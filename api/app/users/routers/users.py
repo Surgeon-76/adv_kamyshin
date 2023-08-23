@@ -1,7 +1,10 @@
-from typing import Optional
+from typing import Annotated, Optional
 
 from fastapi import (
     APIRouter,
+    Body,
+    Path,
+    Query,
     status,
     Depends
 )
@@ -32,10 +35,10 @@ app = APIRouter(
              404: {"model": user.UserPageError}
              }
          )
-async def get_users(descend: Optional[bool] = False,
-                    params: Params = Depends(),
-                    user_service: UserService = Depends(
-                        get_user_service)
+async def get_users(*, descend: Annotated[bool, Query()] = False,
+                    params: Annotated[Params, Depends()],
+                    user_service: Annotated[UserService, Depends(
+                        get_user_service)]
                     ):
     return await user_service.list(params, descend)
 
@@ -49,9 +52,9 @@ async def get_users(descend: Optional[bool] = False,
              },
          status_code=status.HTTP_200_OK
          )
-async def get_user_one(user_id: int,
-                       user_service: UserService = Depends(
-                           get_user_service)
+async def get_user_one(user_id: Annotated[int, Path(ge=1)],
+                       user_service: Annotated[UserService, Depends(
+                           get_user_service)]
                        ):
     return await user_service.get_one(user_id)
 
@@ -65,10 +68,10 @@ async def get_user_one(user_id: int,
              400: {"model": user.UserError}
              }
           )
-async def user_create(users: user.UserCreate,
-                      user_service: UserService = Depends(
-                          get_user_service),
-                    #   user_jwt: str = Depends(get_current_user)
+async def user_create(users: Annotated[user.UserCreate, Body()],
+                      user_service: Annotated[UserService, Depends(
+                          get_user_service)],
+                    #   user_jwt: Annotated[str, Depends(get_current_user)]
                       ):
     return await user_service.create(users)
 
@@ -81,11 +84,11 @@ async def user_create(users: user.UserCreate,
              400: {"model": user.UserError}
              }
          )
-async def user_update(user_id: int,
-                      users: user.UserUpdate,
-                      user_service: UserService = Depends(
-                          get_user_service),
-                      # user_jwt: str = Depends(get_current_user)
+async def user_update(user_id: Annotated[int, Path(ge=1)],
+                      users: Annotated[user.UserUpdate, Body()],
+                      user_service: Annotated[UserService, Depends(
+                          get_user_service)],
+                      # user_jwt: Annotated[str, Depends(get_current_user)]
                       ):
     return await user_service.update(user_id, users)
 
@@ -97,10 +100,10 @@ async def user_update(user_id: int,
              400: {"model": user.UserError}
              }
             )
-async def user_delete(user_id: int,
-                      user_service: UserService = Depends(
-                          get_user_service),
-                    #   user_jwt: str = Depends(get_current_user)
+async def user_delete(user_id: Annotated[int, Path()],
+                      user_service: Annotated[UserService, Depends(
+                          get_user_service)],
+                    #   user_jwt: annotated[str, Depends(get_current_user)]
                       ):
     return await user_service.delete(user_id)
 
