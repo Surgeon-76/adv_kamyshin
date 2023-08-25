@@ -2,8 +2,6 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from ..users.models.manager import Role
-
 
 class TokenPayload(BaseModel):
     sub: str = None
@@ -19,7 +17,6 @@ class UserOut(BaseModel):
 
 class UserOutSystem(BaseModel):
     email: str
-    role: Role | str = 'client'
 
     class Config:
         orm_mode = True

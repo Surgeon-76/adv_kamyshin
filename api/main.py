@@ -11,13 +11,13 @@ from config.database import (
     engine
 )
 
-from app.users.models.users import User    # Удалить в последствии
+# from app.users.models.users import User    # Удалить в последствии
 
 # from buysell_advertisement.categories.routers import categories as categories
 # from buysell_advertisement.ads.routers import ads as ads
 # from buysell_advertisement.ads.routers import services as services
 from app.users.routers import users
-# from users.routers import auth as auth
+from app.auth import routes as auth
 # from buysell_advertisement.ads.routers import image_ads as image_gallery
 # from email_message.router import app as email_router
 from tools import generate_content as generate
@@ -80,6 +80,6 @@ app.add_middleware(
 
 
 app.include_router(users.app)
-# app.include_router(auth.app)
+app.include_router(auth.app)
 app.include_router(generate.app)
 # app.include_router(email_router)

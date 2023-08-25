@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.sessions import get_session
-from ..system.ver_user import get_user_by_email_or_phone
+from ..system.ver_user import get_user_by_id
 from .schemas import (
     SystemUser,
     UserOutSystem,
@@ -40,7 +40,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(),
         form_data.username = ''.join(
             [n for n in form_data.username if n.isdigit() or n == '+'])
 
-    user = (await get_user_by_email_or_phone(
+    user = (await get_user_by_id(
         form_data.username, db))
 
     if (user is None) or (not verify_password(form_data.password,

@@ -4,14 +4,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..users.models.client import Client
-from ..users.models.manager import Manager
+from ..users.models.users import User
 
 
-async def get_user_by_email_or_phone(username: str, db: AsyncSession):
-    return (((await db.execute(select(Client)
-                               .where(or_(Client.email == username,
-                                          Client.phone == username)))).first())
-            or
-            ((await db.execute(select(Manager)
-                               .where(Manager.email == username))).first()))
+async def get_user_by_id(userid: str, db: AsyncSession):
+    return ((await db.execute(select(User)
+                               .where(or_(User.google_id == userid,
+                                          User.yandex_id == userid,
+                                          User.telegram_id == userid,
+                                          User.vk_id == userid)))).first())
+           

@@ -5,7 +5,7 @@ from fastapi import (
     status,
     Depends
 )
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2AuthorizationCodeBearer
 from jose import (
     jwt,
     JWTError
@@ -13,7 +13,7 @@ from jose import (
 from pydantic import ValidationError
 
 from ..schemas import TokenPayload, SystemUser
-from app.system.ver_user import get_user_by_email_or_phone
+from app.system.ver_user import get_user_by_id
 from config.sessions import get_session
 from .token import (
     ALGORITHM,
@@ -47,7 +47,7 @@ async def get_current_user(token: str = Depends(reuseable_oauth)
             headers={"WWW-Authenticate": "Bearer"},
         ) from e
 
-    user = await get_user_by_email_or_phone(token_data.sub, db)
+    user = await get_user_by_id(token_data.sub, db)
     # print(token_data.sub)
     # print(user)
     if user is None:
