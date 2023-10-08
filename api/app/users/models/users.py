@@ -1,5 +1,5 @@
 from __future__ import annotations
-from sqlalchemy import(
+from sqlalchemy import (
     Boolean,
     Integer,
     String
@@ -10,12 +10,11 @@ from sqlalchemy.orm import (
     relationship
 )
 
-
 from config.database import Base
 
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     google_id: Mapped[str | None] = mapped_column(String, default=None)
