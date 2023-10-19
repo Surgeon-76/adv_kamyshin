@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import enum
 import decimal
 
 from sqlalchemy import (
     DECIMAL,
-    Enum,
     Integer,
     String,
     Text,
