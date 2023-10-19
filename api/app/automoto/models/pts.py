@@ -27,3 +27,8 @@ class Pts(Base):
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
+
+
+"""
+    pts 'Номер ПТС'
+"""

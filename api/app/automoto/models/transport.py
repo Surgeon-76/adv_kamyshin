@@ -32,3 +32,9 @@ class Transport(Base):
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
+
+
+"""
+    color 'Цвет'
+    vin 'VIN или номер кузова(рамы)'
+"""
