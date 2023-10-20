@@ -39,6 +39,7 @@ class AvtoTth(Base):
 
     transport: Mapped['Transport'] = relationship(back_populates='avto_tth',
                                                   uselist=False)
+    addit: Mapped['AvtoAddit'] = relationship(back_populates='tth')
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"

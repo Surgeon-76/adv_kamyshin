@@ -22,7 +22,7 @@ class ModelAuto(Base):
     model: Mapped[str] = mapped_column(String())
 
     body: Mapped[list['BodyType']] = relationship(back_populates='model')
-    branb: Mapped['ModelAuto'] = relationship(back_populates='model')
+    brand: Mapped['BrandAuto'] = relationship(back_populates='model')
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
