@@ -23,6 +23,7 @@ class BodyType(Base):
 
     avtotth: Mapped['AvtoTth'] = relationship(back_populates='bodytype',
                                               uselist=False)
+    model: Mapped['ModelAuto'] = relationship(back_populates='body')
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
