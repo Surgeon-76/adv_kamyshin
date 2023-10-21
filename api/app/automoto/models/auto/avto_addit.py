@@ -19,11 +19,11 @@ class AvtoAddit(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     power_steering: Mapped[str] = mapped_column(String(),
-                                                default='Электроусилитель')
-    climate: Mapped[str] = mapped_column(String(), default='Климат-контроль')
+                                                default='Электрический')
+    climate: Mapped[str] = mapped_column(String(), default='Кондиционер')
     multirul: Mapped[bool] = mapped_column(Boolean, default=False)
     athermal_glass: Mapped[bool] = mapped_column(Boolean, default=False)
-    salon: Mapped[str] = mapped_column(String(), default='Велюр')
+    salon: Mapped[str] = mapped_column(String(), default='Ткань')
     leather_steering: Mapped[bool] = mapped_column(Boolean, default=False)
     sunfoof: Mapped[bool] = mapped_column(Boolean, default=False)
     collor_salon: Mapped[str] = mapped_column(String(), default='Светлый')
@@ -141,9 +141,9 @@ class AvtoAddit(Base):
     bluetooth         'Bluetooth'
     gpsnavi           'GPS-навигатор'
     audiosystem       '2 колонки,
-                                      4 колонки,
-                                      6 колонок,
-                                      8+ колонок'
+                        4 колонки,
+                        6 колонок,
+                        8+ колонок'
     sw                'Сабвуфер'
     light             'Галогеновые, Ксеноновые, Светодиодные'
     fog_lights        'Противотуманные фары'
