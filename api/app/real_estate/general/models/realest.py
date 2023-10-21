@@ -60,6 +60,8 @@ class RealEstate(Base):
 
     ads: Mapped['Ads'] = relationship(back_populates='realest',
                                       uselist=False)
+    contacts: Mapped['Contacts'] = relationship(back_populates='realest',
+                                                uselist=False)
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
