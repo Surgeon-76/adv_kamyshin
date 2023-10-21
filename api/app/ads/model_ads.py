@@ -38,5 +38,8 @@ class Ads(Base):
     category_id: Mapped[int] = mapped_column(Integer,
                                              ForeignKey('categorys.id'))
 
+    transport: Mapped['Transport' | None] = relationship(back_populates='ads')
+    realestate: Mapped['RealEstate' | None] = relationship(back_populates='ads')
+
     def __repr__(self) -> str:
         return f"{self.__dict__}"
