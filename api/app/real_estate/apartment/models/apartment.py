@@ -41,9 +41,18 @@ class Apartment(Base):
     pan_windows: Mapped[bool | None] = mapped_column(Boolean, default=None)
     isolated: Mapped[bool | None] = mapped_column(Boolean, default=None)
     adjacent: Mapped[bool | None] = mapped_column(Boolean, default=None)
-    total_space: Mapped[decimal] = mapped_column(DECIMAL, default=0.00)
-    kitch_space: Mapped[decimal] = mapped_column(DECIMAL, default=0.00)
-    living_space: Mapped[decimal] = mapped_column(DECIMAL, default=0.00)
+    total_space: Mapped[decimal.Decimal
+                        ] = mapped_column(DECIMAL(precision=10,
+                                                  scale=2),
+                                          default=0.00)
+    kitch_space: Mapped[decimal.Decimal
+                        ] = mapped_column(DECIMAL(precision=10,
+                                                  scale=2),
+                                          default=0.00)
+    living_space: Mapped[decimal.Decimal
+                         ] = mapped_column(DECIMAL(precision=10,
+                                                   scale=2),
+                                           default=0.00)
     bathroom_combi: Mapped[bool | None] = mapped_column(Boolean, default=None)
     bathroom_separ: Mapped[bool | None] = mapped_column(Boolean, default=None)
     window_rear: Mapped[bool | None] = mapped_column(Boolean, default=None)
@@ -68,11 +77,11 @@ class Apartment(Base):
                      ] = relationship(back_populates='apartment',
                                       uselist=False)
     term_transaction: Mapped['TermTransaction'
-                     ] = relationship(back_populates='apartment',
-                                      uselist=False)
+                             ] = relationship(back_populates='apartment',
+                                              uselist=False)
     rules_of_sett: Mapped['RulesOfSett'
-                     ] = relationship(back_populates='apartment',
-                                      uselist=False)
+                          ] = relationship(back_populates='apartment',
+                                           uselist=False)
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
