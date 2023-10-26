@@ -34,8 +34,8 @@ class Building(Base):
     park_open: Mapped[bool] = mapped_column(Boolean, default=False)
     park_behbarrier: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    apartment: Mapped['Building'
-                     ] = relationship(back_populates='building')
+    apartment: Mapped['Apartment'
+                      ] = relationship(back_populates='building')
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
