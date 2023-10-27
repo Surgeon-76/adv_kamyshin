@@ -36,10 +36,13 @@ class Ads(Base):
                                          ForeignKey('user.id',
                                                     ondelete='CASCADE'))
     category_id: Mapped[int] = mapped_column(Integer,
-                                             ForeignKey('categorys.id'))
+                                             ForeignKey('category.id',
+                                                        ondelete='CASCADE'))
 
     transport: Mapped['Transport' | None] = relationship(back_populates='ads')
-    realestate: Mapped['RealEstate' | None] = relationship(back_populates='ads')
+    realestate: Mapped['RealEstate' | None
+                       ] = relationship(back_populates='ads')
+    category: Mapped['Category'] = relationship(back_populates='ads')
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"

@@ -28,6 +28,8 @@ class Category(Base):
                    ] = relationship(back_populates='children',
                                     remote_side=[id])
 
+    ads: Mapped[list['Ads']] = relationship(back_populates='category')
+
     def __repr__(self) -> str:
         return f"{self.__dict__}"
 
