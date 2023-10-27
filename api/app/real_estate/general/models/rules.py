@@ -26,13 +26,10 @@ class RulesOfSett(Base):
     docs: Mapped[bool | None] = mapped_column(Boolean, default=None)
     monthly: Mapped[bool | None] = mapped_column(Boolean, default=None)
 
-    rooms: Mapped['Rooms'] = relationship(back_populates='rules',
-                                          uselist=False)
-    apartment: Mapped['Apartment'] = relationship(back_populates='rules',
-                                                  uselist=False)
+    rooms: Mapped['Rooms'] = relationship(back_populates='rules')
+    apartment: Mapped['Apartment'] = relationship(back_populates='rules')
     construction: Mapped['Construction'
-                         ] = relationship(back_populates='rules',
-                                          uselist=False)
+                         ] = relationship(back_populates='rules')
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"

@@ -56,7 +56,8 @@ class Apartment(Base):
     bathroom_combi: Mapped[bool | None] = mapped_column(Boolean, default=None)
     bathroom_separ: Mapped[bool | None] = mapped_column(Boolean, default=None)
     window_rear: Mapped[bool | None] = mapped_column(Boolean, default=None)
-    window_to_street: Mapped[bool | None] = mapped_column(Boolean, default=None)
+    window_to_street: Mapped[bool | None] = mapped_column(Boolean,
+                                                          default=None)
     window_on_sunny: Mapped[bool | None] = mapped_column(Boolean, default=None)
     repair: Mapped[str]  = mapped_column(String(), default='')
     heated_floor: Mapped[bool | None] = mapped_column(Boolean, default=None)
@@ -64,11 +65,12 @@ class Apartment(Base):
     furn_keeping: Mapped[bool | None] = mapped_column(Boolean, default=None)
     furn_sleep_places: Mapped[bool | None
                               ] = mapped_column(Boolean, default=None)
-    tech_ac: Mapped[bool| None] = mapped_column(Boolean, default=None)
+    tech_ac: Mapped[bool | None] = mapped_column(Boolean, default=None)
     tech_freezer: Mapped[bool | None] = mapped_column(Boolean, default=None)
     tech_washing: Mapped[bool | None] = mapped_column(Boolean, default=None)
     tech_dishwasher: Mapped[bool | None] = mapped_column(Boolean, default=None)
-    tech_waterheater: Mapped[bool | None] = mapped_column(Boolean, default=None)
+    tech_waterheater: Mapped[bool | None] = mapped_column(Boolean,
+                                                          default=None)
     bedding: Mapped[bool | None] = mapped_column(Boolean, default=None)
     towels: Mapped[bool | None] = mapped_column(Boolean, default=None)
     hygiene: Mapped[bool | None] = mapped_column(Boolean, default=None)
@@ -79,9 +81,9 @@ class Apartment(Base):
     term_transaction: Mapped['TermTransaction'
                              ] = relationship(back_populates='apartment',
                                               uselist=False)
-    rules_of_sett: Mapped['RulesOfSett'
-                          ] = relationship(back_populates='apartment',
-                                           uselist=False)
+    rules: Mapped['RulesOfSett'
+                  ] = relationship(back_populates='apartment',
+                                   uselist=False)
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"

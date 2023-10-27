@@ -20,13 +20,10 @@ class TermTransaction(Base):
     ipoteka: Mapped[bool] = mapped_column(Boolean, default=False)
     part: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    rooms: Mapped['Rooms'] = relationship(back_populates='transaction',
-                                          uselist=False)
-    apartment: Mapped['Apartment'] = relationship(back_populates='transaction',
-                                                  uselist=False)
+    rooms: Mapped['Rooms'] = relationship(back_populates='transaction')
+    apartment: Mapped['Apartment'] = relationship(back_populates='transaction')
     construction: Mapped['Construction'
-                         ] = relationship(back_populates='transaction',
-                                          uselist=False)
+                         ] = relationship(back_populates='transaction')
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
