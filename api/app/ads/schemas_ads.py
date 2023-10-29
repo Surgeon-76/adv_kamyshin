@@ -46,8 +46,8 @@ class AdsCreate(BaseAds):
 class AdsUpdate(BaseAds, AdsID):
     pass
 
-
 # #############################################################
+
 
 class AdsResp(BaseModel):
     status: str = 'succes'
