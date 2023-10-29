@@ -25,7 +25,7 @@ class Ads(Base):
     title: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(Text)
     price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(
-        precision=10,scale=2), default=0.00)
+        precision=10, scale=2), default=0.00)
     deposit: Mapped[decimal.Decimal | None] = mapped_column(DECIMAL(
         precision=10, scale=2), default=None)
     address: Mapped[str] = mapped_column(String, default='Адрес')
@@ -46,3 +46,14 @@ class Ads(Base):
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
+
+
+"""
+    title 'Название объявления'
+    description 'Описание объявления'
+    price  'Цена'
+    deposit 'Депозит(при снятии или аренде)'
+    address 'Адрес'
+    price_one 'за единицу, за кг и т.д'
+    status 'Статус объявления: Активный, Закончен'
+"""
