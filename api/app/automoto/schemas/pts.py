@@ -8,7 +8,7 @@ from pydantic import (
 class BasePts(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    transport_id: int = 
+    transport_id: int = Field(description='--> transport.id')
     pts: str = Field(description='Номер ПТС',
                      default='Нет')
 

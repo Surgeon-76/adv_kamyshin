@@ -1,16 +1,73 @@
-from __future__ import annotations
-
-from sqlalchemy import (
-    Boolean,
-    Integer
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field
 )
 
-from config.database import Base
+
+class BaseMotoAddit(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    brand: str = Field(description='Бренд мото',
+                       default='')
+    logo: str = Field(description='Логотип',
+                      default='')
+
+
+class MotoAdditID(BaseModel):
+    id: int = Field(description='ID дополнительных параметров мото')
+
+
+class MotoAdditView(BaseMotoAddit, MotoAdditID):
+    pass
+
+
+class MotoAdditCreate(BaseMotoAddit):
+    pass
+
+
+class MotoAdditUpdate(BaseMotoAddit, MotoAdditID):
+    pass
+
+# #############################################################
+
+
+class MotoAdditResp(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: MotoAdditView | None = None
+
+
+class MotoAdditError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: dict | None = None
+
+
+class MotoAdditPage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str = 'succes'
+    status_code: int = 200
+    payload: list[MotoAdditView] | None = None
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
+class MotoAdditPageError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: list | None = None
+
+
+class MotoAdditDel(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: dict | None = None
+
+
 
 
 class MotoAddit(Base):
