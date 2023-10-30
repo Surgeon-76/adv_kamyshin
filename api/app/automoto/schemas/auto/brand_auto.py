@@ -1,32 +1,76 @@
-from __future__ import annotations
-
-from sqlalchemy import (
-    Integer,
-    String
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field
 )
 
-from config.database import Base
+
+class BaseBrandAuto(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    brand: str = Field(description='Бренд авто',
+                       default='')
+    logo: str = Field(description='Логотип',
+                      default='')
 
 
-class BrandAuto(Base):
-    __tablename__ = 'brand_auto'
+class BrandAutoID(BaseModel):
+    id: int = Field(description='ID авто бренда')
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    brand: Mapped[str] = mapped_column(String())
-    logo: Mapped[str] = mapped_column(String())
 
-    model: Mapped[list['ModelAuto']] = relationship(back_populates='brand')
+class BrandAutoView(BaseBrandAuto, BrandAutoID):
+    pass
 
-    def __repr__(self) -> str:
-        return f"{self.__dict__}"
+
+class BrandAutoCreate(BaseBrandAuto):
+    pass
+
+
+class BrandAutoUpdate(BaseBrandAuto, BrandAutoID):
+    pass
+
+# #############################################################
+
+
+class BrandAutoResp(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: BrandAutoView | None = None
+
+
+class BrandAutoError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: dict | None = None
+
+
+class BrandAutoPage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str = 'succes'
+    status_code: int = 200
+    payload: list[BrandAutoView] | None = None
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
+class BrandAutoPageError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: list | None = None
+
+
+class BrandAutoDel(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: dict | None = None
 
 
 """
+model: Mapped[list['ModelAuto']] = relationship(back_populates='brand')
+
     model 'Бренд авто'
     logo 'Логотип'
 """
