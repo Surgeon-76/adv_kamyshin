@@ -1,33 +1,75 @@
-from __future__ import annotations
-
-from sqlalchemy import (
-    Integer,
-    String,
-    ForeignKey
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field
 )
 
-from config.database import Base
+
+class BaseModelMoto(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    brand_id: int = Field(description='--> brand_moto.id')
+    model: str = Field(description='Модель мото',
+                       default='')
 
 
-class ModelMoto(Base):
-    __tablename__ = 'model_moto'
+class ModelMotoID(BaseModel):
+    id: int = Field(description='ID модели мото')
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    brand_id: Mapped[int] = mapped_column(Integer, ForeignKey('brand_moto.id'))
-    model: Mapped[str] = mapped_column(String())
 
-    brand: Mapped['BrandMoto'] = relationship(back_populates='model')
-    mototype: Mapped[list['MotoType']] = relationship(back_populates='model')
+class ModelMotoView(BaseModelMoto, ModelMotoID):
+    pass
 
-    def __repr__(self) -> str:
-        return f"{self.__dict__}"
+
+class ModelMotoCreate(BaseModelMoto):
+    pass
+
+
+class ModelMotoUpdate(BaseModelMoto, ModelMotoID):
+    pass
+
+# #############################################################
+
+
+class ModelMotoResp(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: ModelMotoView | None = None
+
+
+class ModelMotoError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: dict | None = None
+
+
+class ModelMotoPage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str = 'succes'
+    status_code: int = 200
+    payload: list[ModelMotoView] | None = None
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
+class ModelMotoPageError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: list | None = None
+
+
+class ModelMotoDel(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: dict | None = None
 
 
 """
+    brand: Mapped['ModelMoto'] = relationship(back_populates='model')
+    mototype: Mapped[list['MotoType']] = relationship(back_populates='model')
+
     model 'Модель мото'
 """
