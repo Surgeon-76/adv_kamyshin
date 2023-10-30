@@ -1,59 +1,107 @@
-from __future__ import annotations
-
 from datetime import date
 
-from sqlalchemy import (
-    Date,
-    Integer,
-    String,
-    ForeignKey
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field
 )
 
-from config.database import Base
 
+class BaseAvtoTth(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
 
-class AvtoTth(Base):
-    __tablename__ = 'avto_tth'
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    body_id: Mapped[int] = mapped_column(ForeignKey('body_type.id',
-                                                    ondelete='CASCADE'))
-    addit_id: Mapped[int] = mapped_column(ForeignKey('avto_addit.id',
-                                                     ondelete='CASCADE'))
-    release_year: Mapped[date] = mapped_column(Date,
-                                               default=date.today()
+    body_id: int = Field(description='ID body_type')
+    addit_id: int = Field(description='ID avto_addit')
+    release_year: date = Field(description='Год выпуска',
+                               default=date.today()
                                                .strftime("%YYYY"))
-    doors: Mapped[int] = mapped_column(Integer, default=4)
-    generation: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    engine_type: Mapped[str] = mapped_column(String(), default='Бензин')
-    transmission: Mapped[str] = mapped_column(String(), default='Передний')
-    gearbox: Mapped[str] = mapped_column(String(), default='Механическая')
-    version: Mapped[str | None] = mapped_column(String(), nullable=True)
-    package: Mapped[str | None] = mapped_column(String(), nullable=True)
-    wheel: Mapped[str] = mapped_column(String(), default='Правый')
+    doors: int = Field(description='Количество дверей',
+                       default=4)
+    generation: int | None = Field(description='Поколение',
+                                   default=None)
+    engine_type: str = Field(description='Тип двигателя',
+                             default='Бензин')
+    transmission: str = Field(description='Какой привод',
+                              default='Передний')
+    gearbox: str = Field(description='КПП',
+                         default='Механическая')
+    version: str | None = Field(
+        description='Модификация(прим:1.6 МТ (125 л.с.))',
+        default=None)
+    package: str | None = Field(description='Комплектация',
+                                default=None)
+    wheel: str = Field(description='Руль', default='Правый')
 
-    transport: Mapped['Transport'] = relationship(back_populates='avto_tth',
-                                                  uselist=False)
-    addit: Mapped['AvtoAddit'] = relationship(back_populates='tth')
+# #TODO: определиться с типом release_year, м.б. использовать str с ограничением по длине?
 
-    def __repr__(self) -> str:
-        return f"{self.__dict__}"
+
+class AvtoTthID(BaseModel):
+    id: int = Field(description='ID Технических характеристик авто')
+
+
+class AvtoTthView(BaseAvtoTth, AvtoTthID):
+    pass
+
+
+class AvtoTthCreate(BaseAvtoTth):
+    pass
+
+
+class AvtoTthUpdate(BaseAvtoTth, AvtoTthID):
+    pass
+
+# #############################################################
+
+
+class AvtoTthResp(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: AvtoTthView | None = None
+
+
+class AvtoTthError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: dict | None = None
+
+
+class AvtoTthPage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str = 'succes'
+    status_code: int = 200
+    payload: list[AvtoTthView] | None = None
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
+class AvtoTthPageError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: list | None = None
+
+
+class AvtoTthDel(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: dict | None = None
 
 
 """
-    release_year 'Год выпуска'
-    doors 'Количество дверей'
-    generation 'Поколение'
-    engine_type 'Тип двигателя(Бензин, Дизель, Газ, Гибрид, Электро)'
+    transport: 'Transport'] = relationship(back_populates='avto_tth',
+                                                  uselist=False)
+    addit: 'AvtoAddit'] = relationship(back_populates='tth')
+
+    release_year  'Год выпуска'
+    doors         'Количество дверей'
+    generation    'Поколение'
+    engine_type   'Тип двигателя(Бензин, Дизель, Газ, Гибрид, Электро)'
     transmission  'Привод: Задний, Передний, Полный'
-    gearbox  'КПП: Механическая, Автоматическая, Вариатор, Роботизированная,
-            Прямой привод'
-    version 'Модификация(1.6 МТ (125 л.с.))'
-    package 'Комплектация: Базовая, Trend, Trend Sport, Titanium'
-    wheel 'Руль: Правый, Левый'
+    gearbox       'КПП: Механическая, Автоматическая, Вариатор,
+                        Роботизированная, Прямой привод'
+    version       'Модификация(1.6 МТ (125 л.с.))'
+    package       'Комплектация: Базовая, Trend, Trend Sport, Titanium'
+    wheel         'Руль: Правый, Левый'
 """
