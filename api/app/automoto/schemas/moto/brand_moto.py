@@ -1,32 +1,76 @@
-from __future__ import annotations
-
-from sqlalchemy import (
-    Integer,
-    String
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field
 )
 
-from config.database import Base
+
+class BaseBrandMoto(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    brand: str = Field(description='Бренд мото',
+                       default='')
+    logo: str = Field(description='Логотип',
+                      default='')
 
 
-class BrandMoto(Base):
-    __tablename__ = 'brand_moto'
+class BrandMotoID(BaseModel):
+    id: int = Field(description='ID бренда мото')
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    brand: Mapped[str] = mapped_column(String())
-    logo: Mapped[str] = mapped_column(String())
 
-    model: Mapped[list['ModelMoto']] = relationship(back_populates='brand')
+class BrandMotoView(BaseBrandMoto, BrandMotoID):
+    pass
 
-    def __repr__(self) -> str:
-        return f"{self.__dict__}"
+
+class BrandMotoCreate(BaseBrandMoto):
+    pass
+
+
+class BrandMotoUpdate(BaseBrandMoto, BrandMotoID):
+    pass
+
+# #############################################################
+
+
+class BrandMotoResp(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: BrandMotoView | None = None
+
+
+class BrandMotoError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: dict | None = None
+
+
+class BrandMotoPage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str = 'succes'
+    status_code: int = 200
+    payload: list[BrandMotoView] | None = None
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
+class BrandMotoPageError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: list | None = None
+
+
+class BrandMotoDel(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: dict | None = None
 
 
 """
+    model: Mapped[list['ModelMoto']] = relationship(back_populates='brand')
+
     model 'Бренд мото'
     logo 'Логотип'
 """
