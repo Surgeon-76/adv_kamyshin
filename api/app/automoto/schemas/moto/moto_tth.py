@@ -1,53 +1,101 @@
-from __future__ import annotations
-
 from datetime import date
 
-from sqlalchemy import (
-    Date,
-    Integer,
-    String,
-    ForeignKey
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field
 )
 
-from config.database import Base
+
+class BaseMotoTth(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    moto_id: int = Field(description='--> moto_type.id')
+    addit_id: int = Field(description='--> moto_addit.id')
+    release_year: date = Field(description='Год выпуска',
+                               default=date.today().strftime("%YYYY"))
+    engine_type: str = Field(description='Тип двигателя',
+                             default='Бензин')
+    power: int | None = Field(description='Мощность двигателя, л/с',
+                              default=None)
+    volume: int | None = Field(description='Объём двигателя, см*3',
+                               default=None)
+    fuel_supply: str = Field(description='Подача топлива',
+                             default='Карбюратор')
+    drive_type: str = Field(description='Привод',
+                            default='Цепь')
+    cycles: str = Field(description='Число тактов',
+                        default='2')
+    cylinders: int = Field(description='Число цилиндров',
+                           default=1)
+    gearbox: str = Field(description='КПП',
+                         default='Механика')
+    scheme: str | None = Field(description='Раположение цилиндров',
+                               default=None)
+    cooling: str = Field(description='Охлаждение',
+                         default='Воздушное')
 
 
-class MotoTth(Base):
-    __tablename__ = 'moto_tth'
+class MotoTthID(BaseModel):
+    id: int = Field(description='ID технических характеристик мото')
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    moto_id: Mapped[int] = mapped_column(ForeignKey('moto_type.id',
-                                                    ondelete='CASCADE'))
-    addit_id: Mapped[int] = mapped_column(ForeignKey('moto_addit.id',
-                                                     ondelete='CASCADE'))
-    release_year: Mapped[date] = mapped_column(Date,
-                                               default=date.today()
-                                               .strftime("%YYYY"))
-    engine_type: Mapped[str] = mapped_column(String(), default='Бензин')
-    power: Mapped[int] = mapped_column(Integer, nullable=True)
-    volume: Mapped[int] = mapped_column(Integer, nullable=True)
-    fuel_supply: Mapped[str] = mapped_column(String(), default='Карбюратор')
-    drive_type: Mapped[str] = mapped_column(String(), default='Цепь')
-    cycles: Mapped[str] = mapped_column(String(), default='2')
-    cylinders: Mapped[int] = mapped_column(Integer, default=1)
-    gearbox: Mapped[str] = mapped_column(String(), default='Механика')
-    scheme: Mapped[str | None] = mapped_column(String(), nullable=True)
-    cooling: Mapped[str] = mapped_column(String(), default='Воздушное')
 
-    transport: Mapped['Transport'] = relationship(back_populates='avto_tth',
-                                                  uselist=False)
-    addit: Mapped['MotoAddit'] = relationship(back_populates='tth')
+class MotoTthView(BaseMotoTth, MotoTthID):
+    pass
 
-    def __repr__(self) -> str:
-        return f"{self.__dict__}"
+
+class MotoTthCreate(BaseMotoTth):
+    pass
+
+
+class MotoTthUpdate(BaseMotoTth, MotoTthID):
+    pass
+
+# #############################################################
+
+
+class MotoTthResp(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: MotoTthView | None = None
+
+
+class MotoTthError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: dict | None = None
+
+
+class MotoTthPage(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    status: str = 'succes'
+    status_code: int = 200
+    payload: list[MotoTthView] | None = None
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
+class MotoTthPageError(BaseModel):
+    status: str = 'failure'
+    status_code: int
+    payload: list | None = None
+
+
+class MotoTthDel(BaseModel):
+    status: str = 'succes'
+    status_code: int
+    payload: dict | None = None
 
 
 """
+    transport: Mappedы['Transport'] = relationship(back_populates='avto_tth',
+                                                  uselist=False)
+    addit: Mappedы['MotoAddit'] = relationship(back_populates='tth')
+
+
     release_year  'Год выпуска'
     engine_type   'Тип двигателя(Бензин, Электро)'
     power         'Мощность двигателя л/с'
