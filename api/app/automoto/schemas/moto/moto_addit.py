@@ -8,10 +8,19 @@ from pydantic import (
 class BaseMotoAddit(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    brand: str = Field(description='Бренд мото',
-                       default='')
-    logo: str = Field(description='Логотип',
-                      default='')
+    starter: bool = Field(description='Электростартер',
+                          default=False)
+    abs: bool = Field(description='Антиблокировочная система',
+                      default=False)
+    tcs: bool = Field(
+        description='Противопробуксовочная система(трэкшн-контроль)',
+        default=False)
+    start_stop: bool = Field(description='Система "старт-стоп"',
+                             default=False)
+    windscreen: bool = Field(description='Ветровое стекло',
+                             default=False)
+    trunk: bool = Field(description='Кофр',
+                        default=False)
 
 
 class MotoAdditID(BaseModel):
@@ -68,28 +77,10 @@ class MotoAdditDel(BaseModel):
     payload: dict | None = None
 
 
-
-
-class MotoAddit(Base):
-    __tablename__ = 'moto_addit'
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-
-    starter: Mapped[bool] = mapped_column(Boolean, default=False)
-    abs: Mapped[bool] = mapped_column(Boolean, default=False)
-    tcs: Mapped[bool] = mapped_column(Boolean, default=False)
-    start_stop: Mapped[bool] = mapped_column(Boolean, default=False)
-    windscreen: Mapped[bool] = mapped_column(Boolean, default=False)
-    trunk: Mapped[bool] = mapped_column(Boolean, default=False)
-
-    tth: Mapped['MotoTth'] = relationship(back_populates='addit',
+"""
+    tth: Mappeds['MotoTth'] = relationship(back_populates='addit',
                                           uselist=False)
 
-    def __repr__(self) -> str:
-        return f"{self.__dict__}"
-
-
-"""
     starter    'Электростартер'
     abs        'Антиблокировочная система'
     tcs        'Противопробуксовочная система(трэкшн-контроль)'
