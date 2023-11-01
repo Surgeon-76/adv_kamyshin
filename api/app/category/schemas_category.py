@@ -12,7 +12,6 @@ class BaseCategory(BaseModel):
     title: str = Field(description='Наименование категории')
 
 
-
 class CategoryID(BaseModel):
     id: int = Field(description='ID категории')
 
