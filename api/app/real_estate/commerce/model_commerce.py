@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import decimal
+
 from sqlalchemy import (
     Boolean,
+    DECIMAL,
     Float,
     Integer,
     String,
@@ -24,15 +27,24 @@ class Commerce(Base):
         Integer, ForeignKey('commerce_transaction.id', ondelete='CASCADE')
         )
     entrance: Mapped[str] = mapped_column(String(), default='')
-    entrance_private: Mapped[bool] = mapped_column(Boolean,default=False)
+    entrance_private: Mapped[bool] = mapped_column(Boolean, default=False)
     level: Mapped[int] = mapped_column(Integer, default=1)
     multi_levels: Mapped[bool] = mapped_column(Boolean, default=False)
     office_layout: Mapped[bool | None] = mapped_column(Boolean, default=None)
     open_layout: Mapped[bool | None] = mapped_column(Boolean, default=None)
-    space: Mapped[float] = mapped_column(Float, default=0)
-    height: Mapped[float] = mapped_column(Float, default=0)
+    space: Mapped[decimal.Decimal
+                  ] = mapped_column(DECIMAL(precision=10,
+                                            scale=2),
+                                    default=0.00)
+    height: Mapped[decimal.Decimal
+                   ] = mapped_column(DECIMAL(precision=10,
+                                             scale=2),
+                                     default=0.00)
     finishing: Mapped[str] = mapped_column(String(), default='Чистовая')
-    energosale: Mapped[float] = mapped_column(Float, default=0)
+    energosale: Mapped[decimal.Decimal
+                       ] = mapped_column(DECIMAL(precision=10,
+                                                 scale=2),
+                                         default=0.00)
     energosale_max: Mapped[bool] = mapped_column(Boolean, default=False)
     heating: Mapped[str] = mapped_column(String(), default='Центральное')
     building_read: Mapped[str] = mapped_column(String(),
@@ -64,7 +76,7 @@ class Commerce(Base):
     energosale       'Мощность электросети, кВт'
     energosale_max   'Можно увеличить(мощность электросети)'
     heating          'Отопление: Нет, Центральное, Автономное'
-    building_read    'Готовность: Проект, Строится, В  эксплуатации'
+    building_read    'Готовность: Проект, Строится, В эксплуатации'
     building_type    'Тип здания: нет, Бизнес-центр,
                                        Торговый центр,
                                        Административное здание,
