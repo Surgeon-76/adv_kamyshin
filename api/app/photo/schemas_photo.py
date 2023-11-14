@@ -14,7 +14,7 @@ class BasePhoto(BaseModel):
 
 
 class PhotoID(BaseModel):
-    id: int = Field(description='ID объявления')
+    id: int = Field(description='ID фото')
 
 
 class PhotoView(BasePhoto, PhotoID):

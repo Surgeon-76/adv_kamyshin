@@ -41,7 +41,7 @@ class BaseBuilding(BaseModel):
 
 
 class BuildingID(BaseModel):
-    id: int = Field(description='ID объявления')
+    id: int = Field(description='ID здания')
 
 
 class BuildingView(BaseBuilding, BuildingID):

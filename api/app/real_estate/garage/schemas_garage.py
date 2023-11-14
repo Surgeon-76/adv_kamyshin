@@ -20,7 +20,7 @@ class BaseGarage(BaseModel):
 
 
 class GarageID(BaseModel):
-    id: int = Field(description='ID объявления')
+    id: int = Field(description='ID гаража')
 
 
 class GarageView(BaseGarage, GarageID):

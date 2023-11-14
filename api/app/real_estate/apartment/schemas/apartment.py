@@ -73,7 +73,7 @@ class BaseApartment(BaseModel):
 
 
 class ApartmentID(BaseModel):
-    id: int = Field(description='ID категории')
+    id: int = Field(description='ID квартиры')
 
 
 class ApartmentView(BaseApartment, ApartmentID):

@@ -81,7 +81,7 @@ class BaseConstruction(BaseModel):
 
 
 class ConstructionID(BaseModel):
-    id: int = Field(description='ID объявления')
+    id: int = Field(description='ID постройки')
 
 
 class ConstructionView(BaseConstruction, ConstructionID):

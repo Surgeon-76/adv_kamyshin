@@ -58,7 +58,7 @@ class BaseCommerce(BaseModel):
 
 
 class CommerceID(BaseModel):
-    id: int = Field(description='ID объявления')
+    id: int = Field(description='ID коммер недвиж')
 
 
 class CommerceView(BaseCommerce, CommerceID):
