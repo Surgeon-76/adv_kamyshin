@@ -59,7 +59,7 @@ class BaseRooms(BaseModel):
 
 
 class RoomsID(BaseModel):
-    id: int = Field(description='ID фото')
+    id: int = Field(description='ID комнаты')
 
 
 class RoomsView(BaseRooms, RoomsID):
