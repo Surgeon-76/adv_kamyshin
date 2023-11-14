@@ -21,7 +21,7 @@ class BaseParkingSpace(BaseModel):
 
 
 class ParkingSpaceID(BaseModel):
-    id: int = Field(description='ID фото')
+    id: int = Field(description='ID машино места')
 
 
 class ParkingSpaceView(BaseParkingSpace, ParkingSpaceID):
