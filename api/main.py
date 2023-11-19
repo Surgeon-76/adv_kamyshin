@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import (
     FastAPI,
     Request
@@ -26,8 +28,15 @@ from tools import generate_content as generate
 # from buysell_advertisement.main import app as appads
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+
 app = FastAPI(
     # root_path="/api/v1",
+    lifespan=lifespan,
     openapi_url="/api/v1/openapi.json",
     docs_url="/api/v1/docs",
     redoc_url="/api/v1/redoc",
@@ -56,10 +65,10 @@ app.mount("/api/v1/static", StaticFiles(directory="static"), name="static")
 #         await conn.run_sync(Base.metadata.create_all)
 
 
-@app.on_event("startup")
-async def startup() -> None:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+# @app.on_event("startup")
+# async def startup() -> None:
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
 
 
 origins = [

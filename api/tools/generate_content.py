@@ -1,3 +1,5 @@
+# from contextlib import asynccontextmanager
+
 import random
 import uuid
 
@@ -41,7 +43,14 @@ from config.sessions import get_session
 # )
 
 
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
+#     yield
+
 app = APIRouter(
+    # lifespan=lifespan,
     prefix="/api/v1/generate",
     tags=["Генератор контента:"]
 )
