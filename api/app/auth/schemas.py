@@ -1,6 +1,9 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import (
+    BaseModel,
+    ConfigDict
+)
 
 
 class TokenPayload(BaseModel):
@@ -9,17 +12,15 @@ class TokenPayload(BaseModel):
 
 
 class UserOut(BaseModel):
-    email: str
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        orm_mode = True
+    email: str
 
 
 class UserOutSystem(BaseModel):
-    email: str
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        orm_mode = True
+    email: str
 
 
 class SystemUser(UserOut):
