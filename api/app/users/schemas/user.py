@@ -1,10 +1,11 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    field_validator
+    field_validator,
+    model_validator
 )
 
 # TODO: сделать None в полях
@@ -14,13 +15,13 @@ class BaseUser(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     google_id: str | None = Field(description='google_id',
-                                  default='')
+                                  default=None)
     yandex_id: str | None = Field(description='yandex_id',
-                                  default='')
+                                  default=None)
     telegram_id: str | None = Field(description='telegram_id',
-                                    default='')
+                                    default=None)
     vk_id: str | None = Field(description='vk_id',
-                              default='')
+                              default=None)
     username: str = Field(description='Никнейм пользователя',
                           default='user')
     first_name: str | None = Field(description='Имя пользователя',
@@ -35,6 +36,20 @@ class BaseUser(BaseModel):
     is_admin: bool = Field(description='Админ', default=False)
     is_client: bool = Field(description='Пользователь', default=True)
     is_active: bool = Field(description='Активный', default=True)
+    
+    @field_validator('google_id',
+                     'yandex_id',
+                     'telegram_id',
+                     'vk_id',
+                     'first_name',
+                     'last_name',
+                     'email',
+                     'avatar')
+    @classmethod
+    def check_field_none(cls, field) -> Any:
+        if field in ['string', '']:
+            field = None
+        return field
 
 
 class UserID(BaseModel):

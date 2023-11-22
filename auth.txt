@@ -1,0 +1,190 @@
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    google_id = models.CharField(max_length=255, blank=True, null=True)
+    yandex_id = models.CharField(max_length=255, blank=True, null=True)
+    telegram_id = models.CharField(max_length=255, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=255, blank=True, null=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    avatar     = ProcessedImageField(verbose_name='Аватар пользователя',
+                                        upload_to=avatar_path,
+                                        processors=[ResizeToFit(256, 256)],
+                                        format='JPEG',
+                                        options={'quality': 75},
+                                        blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_client = models.BooleanField(default=False)
+    
+**************************************************************************************************
+    
+class GoogleAuthSerializer(serializers.Serializer):
+        #         {
+        #     "iss": "https://accounts.google.com",
+        #     "nbf": 1687099978,
+        #     "aud": "274332334445-gr488tgbkj9vu15c2d5jm9mcb5cbaqiu.apps.googleusercontent.com",
+        # Id   "sub": "114119610443044168230", 
+        #     "email": "glebhleb8989@gmail.com",
+        #     "email_verified": true,
+        #     "azp": "274332334445-gr488tgbkj9vu15c2d5jm9mcb5cbaqiu.apps.googleusercontent.com",
+        #     "name": "Глеб Туманов",
+        #     "picture": "https://lh3.googleusercontent.com/a/AAcHTtde9J6R5pn9csPD_h3qINKzIM9AYUJsfLRW8jy3=s96-c",
+        #     "given_name": "Глеб",
+        #     "family_name": "Туманов",
+        #     "iat": 1687100278,
+        #     "exp": 1687103878,
+        #     "jti": "026b0f5cf70c4965c4f750fd099348ed75d612d7"
+        # }
+    sub = serializers.CharField()
+    email = serializers.EmailField()
+    name = serializers.CharField()
+    picture = serializers.CharField(required=False)
+    given_name = serializers.CharField()
+    family_name = serializers.CharField()
+
+
+    def create(self, validated_data):
+        user, created = CustomUser.objects.update_or_create(
+            google_id=validated_data.get('sub', None),
+            defaults={'email': validated_data.get('email', None),
+                      'username': validated_data.get('name', None),
+                      'first_name': validated_data.get('given_name', None),
+                      'last_name': validated_data.get('family_name', None),
+                      'avatar': validated_data.get('picture', None)
+                      }
+        )
+        return user
+    
+class YandexAuthSerializer(serializers.Serializer):
+    #     {
+  #     "id": "1018632790",
+  #     "login": "tumanov.gl",
+  #     "client_id": "effc6da4837340c39c62d8f778192fd2",
+  #     "display_name": "Глеб хлеб",
+  #     "real_name": "глеб туманов",
+  #     "first_name": "глеб",
+  #     "last_name": "туманов",
+  #     "sex": "male",
+  #     "default_email": "tumanov.gl@yandex.ru",
+  #     "emails": [
+  #         "tumanov.gl@yandex.ru"
+  #     ],
+  #     "birthday": "",
+  #     "default_avatar_id": "0/0-0",
+  #     "is_avatar_empty": true,
+  #     "default_phone": {
+  #         "id": 406386025,
+  #         "number": "+79991845015"
+  #     },
+  #     "psuid": "1.AAoPIA.554wBR5w8zY_0YmCPDA6gg.Jx49EDJ6fWJ8n1bw5LrsAA"
+  # }
+    id = serializers.CharField()
+    display_name = serializers.CharField()
+    real_name = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    default_email = serializers.EmailField()
+
+
+    def create(self, validated_data):
+        user, created = CustomUser.objects.update_or_create(
+            yandex_id=validated_data.get('id', None),
+            defaults={'email': validated_data.get('default_email', None),
+                      'username': validated_data.get('display_name', None),
+                      'first_name': validated_data.get('first_name', None),
+                      'last_name': validated_data.get('last_name', None)}
+        )
+        return user
+    
+
+class TelegramAuthSerializer(serializers.Serializer):
+    #         {
+    #     "id": 321044549,
+    #     "first_name": "Gleb",
+    #     "username": "hleb89",
+    #     "photo_url": "https://t.me/i/userpic/320/iS_GyjM5tTa6zbKw2N-Y8Y0V7kBJYXl75hROyxNcPLA.jpg",
+    #     "auth_date": 1687099983,
+    #     "hash": "d70253784e26b220353f63f7ad4e2f3342e37055fd272307fd366cb496208662"
+    # }
+    id = serializers.CharField()
+    first_name = serializers.CharField(required=False)
+    username = serializers.CharField(allow_blank=True, required=False)
+    photo_url = serializers.URLField(allow_blank=True, required=False)
+    
+    def create(self, validated_data):
+        user, created = CustomUser.objects.update_or_create(
+            telegram_id=validated_data.get('id', None),
+            defaults={'first_name': validated_data.get('first_name', None),
+                       'avatar': validated_data.get('photo_url', None),
+                      'username': validated_data.get('username', None)}
+            # 'photo_url': вставьте сюда логику для обработки изображений,
+            # если это нужно для вашего приложения.
+        )
+        return user
+
+        
+*****************************************************************************************************
+
+@extend_schema(
+    tags=["AUTH"],
+)  
+class GoogleAuthView(APIView):
+    serializer_class = GoogleAuthSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@extend_schema(
+    tags=["AUTH"],
+)
+class YandexAuthView(APIView):
+    serializer_class = YandexAuthSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            # Генерация и отправка токена аутентификации
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@extend_schema(
+    tags=["AUTH"],
+)
+class TelegramAuthView(APIView):
+    serializer_class = TelegramAuthSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            # Генерация и отправка токена аутентификации
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+  
+  
+
+    
+    
+
+    

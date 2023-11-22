@@ -46,6 +46,7 @@ async def get_users(*, descend: Annotated[bool, Query()] = False,
 @app.get('/{user_id}/',
          summary='Пользователь по ID',
          response_model=user.UserResp,
+        #  response_model_exclude_none=True,
          responses={
              200: {"model": user.UserResp},
              404: {"model": user.UserError}
