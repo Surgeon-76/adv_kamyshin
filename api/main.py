@@ -14,12 +14,11 @@ from config.database import (
 )
 
 # from app.users.models.users import User    # Удалить в последствии
-
-# from buysell_advertisement.categories.routers import categories as categories
 # from buysell_advertisement.ads.routers import ads as ads
 # from buysell_advertisement.ads.routers import services as services
 from app.users.routers import users
 from app.auth import routes as auth
+# from app.category import routers as category
 # from buysell_advertisement.ads.routers import image_ads as image_gallery
 # from email_message.router import app as email_router
 from tools import generate_content as generate
@@ -72,7 +71,7 @@ app.mount("/api/v1/static", StaticFiles(directory="static"), name="static")
 
 
 origins = [
-    'http://localhost:8000',
+    'http://localhost:8000/',
     'http://localhost',
     'http://front:3000',
     'http://127.0.0.1:8000',
@@ -91,4 +90,4 @@ app.add_middleware(
 app.include_router(users.app)
 app.include_router(auth.app)
 app.include_router(generate.app)
-# app.include_router(email_router)
+# app.include_router(category.app)

@@ -18,13 +18,14 @@ class Category(Base):
     __tablename__ = 'category'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    parent_id: Mapped[int] = mapped_column(Integer, ForeignKey('category.id'))
+    parent_id: Mapped[int] = mapped_column(Integer, ForeignKey('category.id'),
+                                           nullable=True)
     title: Mapped[str] = mapped_column(String())
 
     children: Mapped['Category'
                      ] = relationship(back_populates='parent',
                                       cascade="all, delete-orphan",)
-    parent: Mapped['Category' | None
+    parent: Mapped['Category'
                    ] = relationship(back_populates='children',
                                     remote_side=[id])
 
